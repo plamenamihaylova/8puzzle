@@ -1,9 +1,8 @@
+import edu.princeton.cs.algs4.BinarySearchST;
 import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Board {
     private static final int[][] GOAL_TILES = {
@@ -11,9 +10,8 @@ public class Board {
             { 4, 5, 6 },
             { 7, 8, 0 }
     };
-
-
-    private Map<Integer, TileCoordinates> goalCoordinates = new HashMap<>();
+    
+    private BinarySearchST<Integer, TileCoordinates> goalCoordinates = new BinarySearchST<>();
 
     private int[][] tiles;
     private int dimension;
@@ -216,75 +214,75 @@ public class Board {
         }
     }
 
-    public static void main(String[] args) {
-        int[][] tiles = {
-                { 0, 1, 3 },
-                { 4, 2, 5 },
-                { 7, 8, 6 }
-        };
-
-        int[][] tiles_second = {
-                { 8, 1, 3 },
-                { 4, 0, 2 },
-                { 7, 6, 5 }
-        };
-
-        int[][] goal = {
-                { 1, 2, 3 },
-                { 4, 5, 6 },
-                { 7, 8, 0 }
-        };
-        Board board = new Board(tiles);
-        board.generateGoalCoordinates();
-        // for (Integer i : board.goal.keys(0, 9)) {
-        //     System.out.println(board.goal.get(i).toString());
-        // }
-
-        // System.out.println(board.goalCoordinates.get(1).row);
-        // System.out.println(board.goalCoordinates.get(1).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(2).row);
-        // System.out.println(board.goalCoordinates.get(2).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(3).row);
-        // System.out.println(board.goalCoordinates.get(3).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(4).row);
-        // System.out.println(board.goalCoordinates.get(4).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(5).row);
-        // System.out.println(board.goalCoordinates.get(5).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(6).row);
-        // System.out.println(board.goalCoordinates.get(6).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(7).row);
-        // System.out.println(board.goalCoordinates.get(7).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(8).row);
-        // System.out.println(board.goalCoordinates.get(8).col);
-        // System.out.println("-----");
-        // System.out.println(board.goalCoordinates.get(0).row);
-        // System.out.println(board.goalCoordinates.get(0).col);
-        // System.out.println("-----");
-
-        // System.out.println(board.goal.toString());
-        Board board1 = new Board(tiles_second);
-        System.out.println(board1.manhattan());
-        System.out.println(board1.hamming());
-        System.out.println(board1.toString());
-        for (Board neighbor : board1.neighbors()) {
-            System.out.println(neighbor.toString());
-        }
-
-
-        // System.out.println(board.manhattan());
-
-        Board new_board = new Board(goal);
-        System.out.println(new_board.hamming());
-        System.out.println(new_board.manhattan());
-        System.out.println(new_board.isGoal());
-
-    }
+    // public static void main(String[] args) {
+    //     int[][] tiles = {
+    //             { 0, 1, 3 },
+    //             { 4, 2, 5 },
+    //             { 7, 8, 6 }
+    //     };
+    //
+    //     int[][] tiles_second = {
+    //             { 8, 1, 3 },
+    //             { 4, 0, 2 },
+    //             { 7, 6, 5 }
+    //     };
+    //
+    //     int[][] goal = {
+    //             { 1, 2, 3 },
+    //             { 4, 5, 6 },
+    //             { 7, 8, 0 }
+    //     };
+    //     Board board = new Board(tiles);
+    //     board.generateGoalCoordinates();
+    //     // for (Integer i : board.goal.keys(0, 9)) {
+    //     //     System.out.println(board.goal.get(i).toString());
+    //     // }
+    //
+    //     // System.out.println(board.goalCoordinates.get(1).row);
+    //     // System.out.println(board.goalCoordinates.get(1).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(2).row);
+    //     // System.out.println(board.goalCoordinates.get(2).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(3).row);
+    //     // System.out.println(board.goalCoordinates.get(3).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(4).row);
+    //     // System.out.println(board.goalCoordinates.get(4).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(5).row);
+    //     // System.out.println(board.goalCoordinates.get(5).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(6).row);
+    //     // System.out.println(board.goalCoordinates.get(6).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(7).row);
+    //     // System.out.println(board.goalCoordinates.get(7).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(8).row);
+    //     // System.out.println(board.goalCoordinates.get(8).col);
+    //     // System.out.println("-----");
+    //     // System.out.println(board.goalCoordinates.get(0).row);
+    //     // System.out.println(board.goalCoordinates.get(0).col);
+    //     // System.out.println("-----");
+    //
+    //     // System.out.println(board.goal.toString());
+    //     Board board1 = new Board(tiles_second);
+    //     System.out.println(board1.manhattan());
+    //     System.out.println(board1.hamming());
+    //     System.out.println(board1.toString());
+    //     for (Board neighbor : board1.neighbors()) {
+    //         System.out.println(neighbor.toString());
+    //     }
+    //
+    //
+    //     // System.out.println(board.manhattan());
+    //
+    //     Board new_board = new Board(goal);
+    //     System.out.println(new_board.hamming());
+    //     System.out.println(new_board.manhattan());
+    //     System.out.println(new_board.isGoal());
+    //
+    // }
 
 }

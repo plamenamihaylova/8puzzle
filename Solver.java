@@ -1,12 +1,7 @@
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Queue;
 
-import java.util.TreeMap;
-
 public class Solver {
-
-    // BinarySearchST gameTree;
-    private TreeMap<Integer, Board> gameTree;
     private MinPQ<SearchNode> priorityQueue;
 
     private SearchNode searchNode;
@@ -18,10 +13,6 @@ public class Solver {
         searchNode = new SearchNode(initial, 0, null);
         priorityQueue = new MinPQ<>();
         priorityQueue.insert(searchNode);
-        gameTree = new TreeMap<Integer, Board>();
-        gameTree.put(moves(), initial);
-        // gameTree = new BinarySearchST<>();
-        // gameTree.put(searchNode.priority, searchNode);
         moves = 0;
     }
 
@@ -49,11 +40,9 @@ public class Solver {
             for (Board neighbor : node.board.neighbors()) {
                 int priority = neighbor.manhattan();
                 SearchNode neighborSearchNode = new SearchNode(neighbor, priority + moves(), node);
-                if (gameTree.containsValue(neighbor)) continue;
+                if (node.board.equals(neighbor) || (node.previous != null
+                        && node.previous.board.equals(neighbor))) continue;
                 priorityQueue.insert(neighborSearchNode);
-                gameTree.put(moves(), neighbor);
-                // }
-
             }
         }
 
