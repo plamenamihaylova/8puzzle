@@ -2,8 +2,6 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Queue;
 
 public class Solver {
-    private MinPQ<SearchNode> priorityQueue;
-
     private SearchNode searchNode;
     private int moves;
 
@@ -11,8 +9,6 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
         searchNode = new SearchNode(initial, 0, null);
-        priorityQueue = new MinPQ<>();
-        priorityQueue.insert(searchNode);
         moves = 0;
     }
 
@@ -31,22 +27,41 @@ public class Solver {
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
         if (!isSolvable()) return null;
+        MinPQ<SearchNode> priorityQueue = new MinPQ<>();
         Queue<Board> result = new Queue<>();
+
+        if (searchNode.previous == null) priorityQueue.insert(searchNode);
+
+
         while (true) {
             SearchNode node = priorityQueue.delMin();
             result.enqueue(node.board);
-            if (node.board.isGoal()) break;
+
+            if (node.board.isGoal()) return result;
+
             moves++;
             for (Board neighbor : node.board.neighbors()) {
-                int priority = neighbor.manhattan();
-                SearchNode neighborSearchNode = new SearchNode(neighbor, priority + moves(), node);
-                if (node.board.equals(neighbor) || (node.previous != null
-                        && node.previous.board.equals(neighbor))) continue;
-                priorityQueue.insert(neighborSearchNode);
+
+                // if (node.board.equals(neighbor) || (node.previous != null
+                //         && node.previous.board.equals(neighbor))) continue;
+                if (help(neighbor, priorityQueue)) continue;
+                else {
+                    int priority = neighbor.manhattan() + moves();
+
+                    SearchNode neighborSearchNode = new SearchNode(neighbor, priority, node);
+                    priorityQueue.insert(neighborSearchNode);
+                }
+
             }
         }
+    }
 
-        return result;
+
+    private boolean help(Board neighborBoard, MinPQ<SearchNode> priorityQueue) {
+        for (SearchNode n : priorityQueue) {
+            if (n.board.equals(neighborBoard)) return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) {
