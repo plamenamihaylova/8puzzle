@@ -5,48 +5,41 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Board {
-    private int[][] goalTiles;
     private BinarySearchST<Integer, TileCoordinates> goalCoordinates = new BinarySearchST<>();
+
     private int[][] tiles;
     private int[][] twin;
     private int dimension;
-    private TileCoordinates emptyTile;
 
 
     // create a board from an n-by-n array of tiles,
     public Board(int[][] tiles) {
-        this.tiles = new int[tiles.length][tiles.length];
-        this.goalTiles = new int[tiles.length][tiles.length];
-        int i = 1;
-        for (int row = 0; row < tiles.length; row++) {
-            for (int col = 0; col < tiles.length; col++) {
-                // immutable tiles
-                this.tiles[row][col] = tiles[row][col];
-
-                // locate empty tile
-                if (this.tiles[row][col] == 0) emptyTile = new TileCoordinates(row, col);
-
-                // generate goal tiles
-                if (i == tiles.length * tiles.length) i = 0;
-                goalTiles[row][col] = i;
-                i++;
-            }
-        }
+        this.tiles = copyBoardTiles(tiles);
+        //         new int[tiles.length][tiles.length];
+        //
+        // for (int row = 0; row < tiles.length; row++) {
+        //     for (int col = 0; col < tiles.length; col++) {
+        //         // immutable tiles
+        //         this.tiles[row][col] = tiles[row][col];
+        //
+        //     }
+        // }
 
         dimension = this.tiles.length;
-        generateGoalCoordinates();
+        goalCoordinates = generateGoalCoordinates();
     }
 
-    private void generateGoalCoordinates() {
-        int i = 1;
-        for (int x = 0; x < dimension(); x++) {
-            for (int y = 0; y < dimension(); y++) {
-                if (i == dimension() * dimension())
-                    goalCoordinates.put(0, new TileCoordinates(x, y));
-                else goalCoordinates.put(i, new TileCoordinates(x, y));
-                i++;
+    private BinarySearchST<Integer, TileCoordinates> generateGoalCoordinates() {
+        BinarySearchST<Integer, TileCoordinates> result = new BinarySearchST<>();
+        // int i = 1;
+        for (int x = 0, i = 1; x < dimension(); x++) {
+            for (int y = 0; y < dimension(); y++, i++) {
+                if (i == dimension() * dimension()) result.put(0, new TileCoordinates(x, y));
+                else result.put(i, new TileCoordinates(x, y));
+                // i++;
             }
         }
+        return result;
     }
 
     // string representation of this board
@@ -115,7 +108,16 @@ public class Board {
      * {@code false} otherwise
      */
     public boolean isGoal() {
-        return this.equals(new Board(goalTiles));
+        // int i = 1;
+        for (int row = 0, i = 1; row < dimension(); row++) {
+            for (int col = 0; col < dimension(); col++, i++) {
+                if (i == dimension() * dimension()) i = 0;
+                if (this.tiles[row][col] != i) return false;
+                i++;
+            }
+        }
+        return true;
+        // return this.equals(new Board(goalTiles));
     }
 
     /**
@@ -129,6 +131,7 @@ public class Board {
         if (y == null) return false;
         if (y.getClass() != this.getClass()) return false;
         Board that = (Board) y;
+        if (dimension() != ((Board) y).dimension()) return false;
         if (!Arrays.deepEquals(this.tiles, that.tiles)) return false;
         return true;
     }
@@ -136,71 +139,94 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        ArrayList<Board> neighbors = new ArrayList<>();
+        ArrayList<Board> neighbors = new ArrayList<Board>();
 
-        if (emptyTile.row != 0) {
-            neighbors.add(generateNeighborBoard(emptyTile.row - 1, emptyTile.col));
+        TileCoordinates emptyTile = getEmptyTileCoordinates();
+        if (emptyTile == null) return neighbors;
+
+        if (emptyTile.row < tiles.length - 1) {
+            neighbors.add(
+                    newNeighborByRow(emptyTile.row, emptyTile.col, emptyTile.row + 1));
         }
-        if (emptyTile.row != dimension() - 1) {
-            neighbors.add(generateNeighborBoard(emptyTile.row + 1, emptyTile.col));
+
+        if (emptyTile.col < tiles.length - 1) {
+            neighbors.add(
+                    newNeighborByColumn(emptyTile.row, emptyTile.col, emptyTile.col + 1));
         }
-        if (emptyTile.col != 0) {
-            neighbors.add(generateNeighborBoard(emptyTile.row, emptyTile.col - 1));
+
+        if (emptyTile.row > 0) {
+            neighbors.add(
+                    newNeighborByRow(emptyTile.row, emptyTile.col, emptyTile.row - 1));
         }
-        if (emptyTile.col != dimension() - 1) {
-            neighbors.add(generateNeighborBoard(emptyTile.row, emptyTile.col + 1));
+
+        if (emptyTile.col > 0) {
+            neighbors.add(
+                    newNeighborByColumn(emptyTile.row, emptyTile.col, emptyTile.col - 1));
         }
 
         return neighbors;
     }
 
-    private Board generateNeighborBoard(int emptyRowCoordinate, int emptyColCoordinate) {
-
-        int[][] tilescopy = new int[dimension()][dimension()];
+    private TileCoordinates getEmptyTileCoordinates() {
         for (int row = 0; row < tiles.length; row++) {
-            for (int col = 0; col < tiles.length; col++) {
-                tilescopy[row][col] = tiles[row][col];
-            }
+            for (int col = 0; col < tiles[row].length; col++)
+                if (tiles[row][col] == 0) return new TileCoordinates(row, col);
+
         }
-        int swap = tilescopy[emptyTile.row][emptyTile.col];
-        tilescopy[emptyTile.row][emptyTile.col] = tilescopy[emptyRowCoordinate][emptyColCoordinate];
-        tilescopy[emptyRowCoordinate][emptyColCoordinate] = swap;
-
-        return new Board(tilescopy);
-
+        return null;
     }
+
+    private Board newNeighborByRow(int row, int col, int newRow) {
+        int[][] neighbor = copyBoardTiles();
+        neighbor[row][col] = neighbor[newRow][col];
+        neighbor[newRow][col] = 0;
+        return new Board(neighbor);
+    }
+
+    private Board newNeighborByColumn(int row, int col, int newCol) {
+        int[][] neighbor = copyBoardTiles();
+        neighbor[row][col] = neighbor[row][newCol];
+        neighbor[row][newCol] = 0;
+        return new Board(neighbor);
+    }
+
+    private int[][] copyBoardTiles() {
+        int[][] copy = new int[tiles.length][];
+        for (int i = 0; i < tiles.length; i++) {
+            copy[i] = Arrays.copyOf(tiles[i], tiles[i].length);
+        }
+        return copy;
+    }
+
+    private int[][] copyBoardTiles(int[][] tilesToCopy) {
+        int[][] copy = new int[tilesToCopy.length][];
+        for (int row = 0; row < tilesToCopy.length; row++) {
+            copy[row] = Arrays.copyOf(tilesToCopy[row], tilesToCopy[row].length);
+        }
+        return copy;
+    }
+
 
     // a board that is obtained by exchanging any pair of tiles
     public Board twin() {
-
         if (twin == null) {
-            twin = new int[dimension()][dimension()];
-
-            for (int row = 0; row < dimension(); row++) {
-                for (int col = 0; col < dimension(); col++) {
-                    twin[row][col] = tiles[row][col];
-                }
-            }
-
-            int randRow1;
-            int randCol1;
-            int randRow2;
-            int randCol2;
+            twin = copyBoardTiles();
+            int row1, col1, row2, col2;
 
             do {
-                randRow1 = StdRandom.uniformInt(dimension());
-                randCol1 = StdRandom.uniformInt(dimension());
-            } while (twin[randRow1][randCol1] == 0);
+                row1 = StdRandom.uniformInt(dimension());
+                col1 = StdRandom.uniformInt(dimension());
+            } while (twin[row1][col1] == 0);
 
             do {
-                randRow2 = StdRandom.uniformInt(dimension());
-                randCol2 = StdRandom.uniformInt(dimension());
-            } while (twin[randRow2][randCol2] == 0
-                    || twin[randRow1][randCol1] == twin[randRow2][randCol2]);
+                row2 = StdRandom.uniformInt(dimension());
+                col2 = StdRandom.uniformInt(dimension());
+            } while (twin[row2][col2] == 0
+                    || twin[row1][col1] == twin[row2][col2]);
 
-            int swap = twin[randRow1][randCol1];
-            twin[randRow1][randCol1] = twin[randRow2][randCol2];
-            twin[randRow2][randCol2] = swap;
+            int swap = twin[row1][col1];
+            twin[row1][col1] = twin[row2][col2];
+            twin[row2][col2] = swap;
         }
 
 

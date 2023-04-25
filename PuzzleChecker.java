@@ -1,3 +1,6 @@
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
+
 /******************************************************************************
  *  Compilation:  javac-algs4 PuzzleChecker.java
  *  Execution:    java-algs4 PuzzleChecker filename1.txt filename2.txt ...
@@ -26,36 +29,39 @@
  ******************************************************************************/
 
 public class PuzzleChecker {
-
     public static void main(String[] args) {
 
-        // for each command-line argument
-        // for (String filename : args) {
-        //
-        //     // read in the board specified in the filename
-        //     In in = new In(filename);
-        //     int n = in.readInt();
-        //     int[][] tiles = new int[n][n];
-        //     for (int i = 0; i < n; i++) {
-        //         for (int j = 0; j < n; j++) {
-        //             tiles[i][j] = in.readInt();
-        //         }
-        //     }
+        // int[][] tiles = {
+        //         { 0, 1, 3 },
+        //         { 4, 2, 5 },
+        //         { 7, 8, 6 }
+        // };
 
-        int[][] tiles = {
-                { 8, 1, 3 },
-                { 4, 0, 2 },
-                { 7, 6, 5 }
-        };
-
-        // solve the slider puzzle
+        // int[][] tiles = {
+        //         { 1, 2, 3 },
+        //         { 4, 6, 5 },
+        //         { 8, 7, 0 }
+        // };
+        // create initial board from file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        int[][] tiles = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                tiles[i][j] = in.readInt();
         Board initial = new Board(tiles);
-        Solver solver = new Solver(initial);
-        System.out.println(initial.toString());
 
-        System.out.println(solver.solution().toString());
-        System.out.println("moves " + solver.moves());
-        // StdOut.println(filename + ": " + solver.moves());
-        //   }
+        // solve the puzzle
+        Solver solver = new Solver(initial);
+
+        // print solution to standard output
+        if (!solver.isSolvable())
+            StdOut.println("No solution possible");
+        else {
+            StdOut.println("Minimum number of moves = " + solver.moves());
+            for (Board board : solver.solution())
+                StdOut.println(board);
+        }
+
     }
 }
