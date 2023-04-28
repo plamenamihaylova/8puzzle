@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Board {
-    private BinarySearchST<Integer, TileCoordinates> goalCoordinates;
-    private int[][] tiles;
-    private int dimension;
+    private final BinarySearchST<Integer, TileCoordinates> goalCoordinates;
+    private final int[][] tiles;
+    private final int dimension;
     private final int firstIndexToSwap;
     private final int secondIndextoSwap;
 
