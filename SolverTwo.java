@@ -210,7 +210,7 @@ public class SolverTwo {
 
         if (node.board.isGoal()) return processedBoards;
 
-
+        moves++;
         MinPQ<SearchNode> neighbors = getNeighborsPQ(node, new MinPQ<>(), processedBoards);
 
         // for (Board neighbor : node.board.neighbors()) {
@@ -231,7 +231,7 @@ public class SolverTwo {
     private MinPQ<SearchNode> getNeighborsPQ(SearchNode node,
                                              MinPQ<SearchNode> neighbors,
                                              ArrayList<Board> processedBoards) {
-        moves++;
+
         for (Board neighbor : node.board.neighbors()) {
             if (isCurrentBoardAlreadyProcessed(neighbor, processedBoards)) continue;
 
