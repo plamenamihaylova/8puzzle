@@ -3,10 +3,10 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SolverTwo {
     private SearchNode searchNode;
-    private ArrayList<Board> processed;
     private int moves;
 
     private class SearchNode implements Comparable<SearchNode> {
@@ -22,18 +22,6 @@ public class SolverTwo {
             this.moves = moves;
         }
 
-        // public int compare(SearchNode node1, SearchNode node2) {
-        //     int node1Manhattan = node1.manhattan;
-        //     int node2Manhattan = node2.manhattan;
-        //     int node1Priority = node1Manhattan + node1.moves;
-        //     int node2Priority = node2Manhattan + node2.moves;
-        //
-        //     if (node1Priority > node2Priority) return 1;
-        //     if (node1Priority < node2Priority) return -1;
-        //
-        //     return Integer.compare(node1Manhattan, node2Manhattan);
-        // }
-
         public int compareTo(SearchNode that) {
             int node1Manhattan = this.manhattan;
             int node2Manhattan = that.manhattan;
@@ -47,12 +35,10 @@ public class SolverTwo {
         }
     }
 
-
     // find a solution to the initial board (using the A* algorithm)
     public SolverTwo(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
         searchNode = new SearchNode(initial, 0, null);
-        processed = new ArrayList<>();
         moves = 0;
         solution();
     }
@@ -119,155 +105,39 @@ public class SolverTwo {
             // processed.add(searchNode.board);
         }
 
-        result = findSolution(priorityQueue, result);
+        SearchNode solution = findSolution(priorityQueue, result);
 
+        for (SearchNode x = solution; Objects.requireNonNull(x).previous != null;
+             x = solution.previous) {
+            result.add(x.board);
+            moves++;
+        }
         return result;
     }
 
-    // private SearchNode findNodeWithMinimalPriority(MinPQ<SearchNode> priorityQueue,
-    //                                                ArrayList<Board> processedBoards) {
-    //     // private SearchNode findNodeWithMinimalPriority(MinPQ<SearchNode> priorityQueue) {
-    //     if (priorityQueue.size() == 1) return priorityQueue.delMin();
-    //
-    //     SearchNode nodeWithMinPriority = priorityQueue.min();
-    //
-    //     List<SearchNode> nodesWithEqualMinValues = new ArrayList<>();
-    //     if (processedBoards == null) processedBoards = new ArrayList<>();
-    //
-    //     while (!priorityQueue.isEmpty()
-    //             && priorityQueue.min().priority == nodeWithMinPriority.priority) {
-    //         SearchNode node = priorityQueue.delMin();
-    //         processedBoards.add(node.board);
-    //         nodesWithEqualMinValues.add(node);
-    //     }
-    //
-    //     if (nodesWithEqualMinValues.size() > 1) {
-    //
-    //         for (int i = 0; i < nodesWithEqualMinValues.size() - 1; i++) {
-    //             SearchNode currentNode = nodesWithEqualMinValues.get(i);
-    //             SearchNode nextNode = nodesWithEqualMinValues.get(i + 1);
-    //
-    //             MinPQ<SearchNode> currentNodeNeighbors = getNodeNeighbors(currentNode,
-    //                                                                       processedBoards);
-    //             MinPQ<SearchNode> nextNodeNeighbors = getNodeNeighbors(nextNode, processedBoards);
-    //
-    //
-    //             SearchNode firstChild = Objects.requireNonNull(
-    //                     findNodeWithMinimalPriority(currentNodeNeighbors,
-    //                                                 processedBoards));
-    //             SearchNode secondChild = Objects.requireNonNull(
-    //                     findNodeWithMinimalPriority(nextNodeNeighbors,
-    //                                                 processedBoards));
-    //
-    //             if (firstChild.priorityManhattan == 0) return currentNode;
-    //             if (secondChild.priorityManhattan == 0) return nextNode;
-    //
-    //
-    //             if (firstChild.priorityManhattan < secondChild.priorityManhattan)
-    //                 return currentNode;
-    //             else if (firstChild.priorityManhattan > secondChild.priorityManhattan)
-    //                 return nextNode;
-    //             else {
-    //                 MinPQ<SearchNode> temp = new MinPQ<>();
-    //                 temp.insert(firstChild);
-    //                 temp.insert(secondChild);
-    //                 // processedBoards.add(firstChild.previous.board);
-    //                 // processedBoards.add(secondChild.previous.board);
-    //
-    //                 findNodeWithMinimalPriority(temp, processedBoards);
-    //             }
-    //
-    //
-    //             // SearchNode firstGrandChild = findNodeWithMinimalPriority(
-    //             //         getNodeNeighbors(firstChild, processedBoards),
-    //             //         processedBoards);
-    //             // SearchNode secondGrandChild = findNodeWithMinimalPriority(
-    //             //         getNodeNeighbors(secondChild, processedBoards),
-    //             //         processedBoards);
-    //             //
-    //             // if (firstGrandChild.priorityManhattan > secondGrandChild.priorityManhattan)
-    //             //     return firstGrandChild;
-    //             // if (firstGrandChild.priorityManhattan < secondGrandChild.priorityManhattan)
-    //             //     return secondGrandChild;
-    //         }
-    //
-    //     }
-    //
-    //     processedBoards.add(nodesWithEqualMinValues.get(0).previous.board);
-    //     return nodesWithEqualMinValues.get(0);
-    // }
-
-
-    private ArrayList<Board> findSolution(MinPQ<SearchNode> currentPQ,
-                                          ArrayList<Board> processedBoards) {
-
-        // SearchNode node = findNodeWithMinimalPriority(currentPQ, null);
-        // SearchNode node = findNodeWithMinimalPriority(currentPQ); //, processedBoards);
+    private SearchNode findSolution(MinPQ<SearchNode> currentPQ, ArrayList<Board> processedBoards) {
 
         SearchNode node = currentPQ.delMin();
         processedBoards.add(node.board);
-        // result.add(node.board);
 
-        if (node.board.isGoal()) return processedBoards;
+        if (node.board.isGoal()) return node;
+        else findSolution(getNeighborsPQ(node, currentPQ), processedBoards);
 
-        moves++;
-        MinPQ<SearchNode> neighbors = getNeighborsPQ(node, new MinPQ<>(), processedBoards);
-
-        // for (Board neighbor : node.board.neighbors()) {
-        //
-        //     if (isCurrentBoardAlreadyProcessed(neighbor, processedBoards)) continue;
-        //     // int priority = neighbor.manhattan() + moves();
-        //
-        //     SearchNode neighborSearchNode = new SearchNode(neighbor, moves(), node);
-        //     if (neighbors.min().compareTo(neighborSearchNode) == 0) {
-        //
-        //     }
-        //     neighbors.insert(neighborSearchNode); // new SearchNode(neighbor, moves(), node));
-        // }
-
-        return findSolution(neighbors, processedBoards);
+        return node;
     }
 
-    private MinPQ<SearchNode> getNeighborsPQ(SearchNode node,
-                                             MinPQ<SearchNode> neighbors,
-                                             ArrayList<Board> processedBoards) {
-
-        for (Board neighbor : node.board.neighbors()) {
-            if (isCurrentBoardAlreadyProcessed(neighbor, processedBoards)) continue;
-
-            SearchNode neighborSearchNode = new SearchNode(neighbor, moves(), node);
-
-            if (!neighbors.isEmpty() && neighbors.min().compareTo(neighborSearchNode) == 0) {
-
-                for (SearchNode newNeighbor : getNeighborsPQ(neighborSearchNode, neighbors,
-                                                             processedBoards)) {
-                    if (isCurrentBoardAlreadyProcessed(newNeighbor.board, processedBoards))
-                        continue;
-                    neighbors.insert(newNeighbor);
-                }
-                for (SearchNode newNeighbor : getNeighborsPQ(neighbors.min(), neighbors,
-                                                             processedBoards)) {
-                    if (isCurrentBoardAlreadyProcessed(newNeighbor.board, processedBoards))
-                        continue;
-                    neighbors.insert(newNeighbor);
-                }
-            }
-            else {
-
-                neighbors.insert(neighborSearchNode);
-            }
-
-
+    private MinPQ<SearchNode> getNeighborsPQ(SearchNode parent,
+                                             MinPQ<SearchNode> neighbors) {
+        moves++;
+        for (Board neighborBoard : parent.board.neighbors()) {
+            if (parent.previous != null && neighborBoard.equals(parent.previous.board)) continue;
+            SearchNode neighborSearchNode = new SearchNode(neighborBoard, parent.moves + 1, parent);
+            // System.out.println(
+            //         "Moves of neighbor: " + neighborSearchNode.board.toString() + " are: "
+            //                 + neighborSearchNode.moves);
+            neighbors.insert(neighborSearchNode);
         }
         return neighbors;
-    }
-
-    private boolean isCurrentBoardAlreadyProcessed(Board neighborBoard,
-                                                   ArrayList<Board> processedBoards) {
-        for (Board n : processedBoards) {
-            if (n.equals(neighborBoard)) return true;
-        }
-        return false;
     }
 
     public static void main(String[] args) {

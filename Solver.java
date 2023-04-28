@@ -1,14 +1,15 @@
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Objects;
 
 public class Solver {
     private SearchNode searchNode;
-    private ArrayList<Board> processed;
     private int moves;
 
-    private class SearchNode {
+    private class SearchNode implements Comparable<SearchNode> {
         private final Board board;
         private final SearchNode previous;
         private final int manhattan;
@@ -21,27 +22,23 @@ public class Solver {
             this.moves = moves;
         }
 
-        private class SearchNodeComparator implements Comparator<SearchNode> {
-            public int compare(SearchNode node1, SearchNode node2) {
-                int node1Manhattan = node1.manhattan;
-                int node2Manhattan = node2.manhattan;
-                int node1Priority = node1Manhattan + node1.moves;
-                int node2Priority = node2Manhattan + node2.moves;
+        public int compareTo(SearchNode that) {
+            int node1Manhattan = this.manhattan;
+            int node2Manhattan = that.manhattan;
+            int node1Priority = node1Manhattan + this.moves;
+            int node2Priority = node2Manhattan + that.moves;
 
-                if (node1Priority > node2Priority) return 1;
-                if (node1Priority < node2Priority) return -1;
+            if (node1Priority > node2Priority) return 1;
+            if (node1Priority < node2Priority) return -1;
 
-                return Integer.compare(node1Manhattan, node2Manhattan);
-            }
+            return Integer.compare(node1Manhattan, node2Manhattan);
         }
     }
-
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
         searchNode = new SearchNode(initial, 0, null);
-        processed = new ArrayList<>();
         moves = 0;
         solution();
     }
@@ -49,7 +46,7 @@ public class Solver {
     public boolean isSolvable() {
         int inversions = numOfInversions();
         if (searchNode.board.dimension() % 2 == 0) {
-            return (getBlankRow() + inversions) % 2 == 1;
+            return (getBlankRow() + inversions) % 2 != 0;
         }
         else return inversions % 2 == 0;
     }
@@ -100,80 +97,68 @@ public class Solver {
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
         if (!isSolvable()) return null;
-        // BTree<Integer, MinPQ<SearchNode>> gameTree = new BTree<>();
 
         MinPQ<SearchNode> priorityQueue = new MinPQ<>();
         ArrayList<Board> result = new ArrayList<>();
+
         if (searchNode.previous == null) {
             priorityQueue.insert(searchNode);
-            // gameTree.put(moves(), priorityQueue);
+            // processed.add(searchNode.board);
         }
-        result = findSolution(priorityQueue, result);
-        // Stack<SearchNode> processedNodes = new Stack<>();
 
+        SearchNode solution = findSolution(priorityQueue, result);
 
-        // while (true) {
-        //     MinPQ<SearchNode> currentPQ = gameTree.get(moves());
-        //     SearchNode node = currentPQ.delMin();
-        //     processedNodes.push(node);
-        //     result.add(node.board);
-        //     MinPQ<SearchNode> neighborsPQ = new MinPQ<>();
-        //     if (node.priorityHamming == 0 && node.priorityManhattan == 0) return result;
-        //     moves++;
-        //     for (Board neighbor : node.board.neighbors()) {
-        //         // if (node.board.equals(neighbor) || (node.previous != null
-        //         //         && node.previous.board.equals(neighbor))) continue;
-        //         if (isCurrentBoardAlreadyProcessed(neighbor, processedNodes)) continue;
-        //         else {
-        //             // int priority = neighbor.manhattan() + moves();
-        //             SearchNode neighborSearchNode = new SearchNode(neighbor, moves(), node);
-        //             currentPQ.insert(neighborSearchNode);
-        //             gameTree.put(moves(), currentPQ);
-        //             neighborsPQ.insert(neighborSearchNode);
-        //         }
-        //     }
-        // }
+        for (SearchNode x = solution; Objects.requireNonNull(x).previous != null;
+             x = solution.previous) {
+            result.add(x.board);
+            moves++;
+        }
         return result;
     }
 
-    private ArrayList<Board> findSolution(MinPQ<SearchNode> currentPQ,
-                                          ArrayList<Board> processedBoards) {
+    private SearchNode findSolution(MinPQ<SearchNode> currentPQ,
+                                    ArrayList<Board> processedBoards) {
+
         SearchNode node = currentPQ.delMin();
         processedBoards.add(node.board);
-        // result.add(node.board);
 
-        if (node.board.isGoal()) return processedBoards;
+        if (node.board.isGoal()) return node;
+        else findSolution(getNeighborsPQ(node, currentPQ), processedBoards);
+
+        return node;
+    }
+
+    private MinPQ<SearchNode> getNeighborsPQ(SearchNode parent,
+                                             MinPQ<SearchNode> neighbors) {
         moves++;
-
-        MinPQ<SearchNode> neighbors = new MinPQ<>();
-        for (Board neighbor : node.board.neighbors()) {
-            if (isCurrentBoardAlreadyProcessed(neighbor, processedBoards)) continue;
-            int priority = neighbor.manhattan() + moves();
-
-            SearchNode neigborSearchNode = new SearchNode(neighbor, priority, node);
-
-            neighbors.insert(neigborSearchNode);
+        for (Board neighborBoard : parent.board.neighbors()) {
+            if (parent.previous != null && neighborBoard.equals(parent.previous.board)) continue;
+            SearchNode neighborSearchNode = new SearchNode(neighborBoard, parent.moves + 1, parent);
+            neighbors.insert(neighborSearchNode);
         }
-        // find if there are neighbors with the same priority
-
-
-        // for (int n = 0; n < neighbors.size() - 1; n++) {
-        //     if (checkEqualNeighbors[n].priority == checkEqualNeighbors[n + 1].priority)
-        //         findMinPriorityNeighbor(checkEqualNeighbors[n], checkEqualNeighbors[n + 1]);
-        // }
-        return findSolution(neighbors, processedBoards);
-        // return processedBoards;
+        return neighbors;
     }
-    
-    private boolean isCurrentBoardAlreadyProcessed(Board neighborBoard,
-                                                   ArrayList<Board> processedBoards) {
-        for (Board n : processedBoards) {
-            if (n.equals(neighborBoard)) return true;
-        }
-        return false;
-    }
+
 
     public static void main(String[] args) {
+        In in = new In(args[0]);
+        int n = in.readInt();
+        int[][] tiles = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                tiles[i][j] = in.readInt();
+        Board initial = new Board(tiles);
 
+        // solve the puzzle
+        Solver solver = new Solver(initial);
+
+        // print solution to standard output
+        if (!solver.isSolvable())
+            StdOut.println("No solution possible");
+        else {
+            StdOut.println("Minimum number of moves = " + solver.moves());
+            for (Board board : solver.solution())
+                StdOut.println(board);
+        }
     }
 }

@@ -30,18 +30,6 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class PuzzleChecker {
     public static void main(String[] args) {
-
-        // int[][] tiles = {
-        //         { 0, 1, 3 },
-        //         { 4, 2, 5 },
-        //         { 7, 8, 6 }
-        // };
-
-        // int[][] tiles = {
-        //         { 1, 2, 3 },
-        //         { 4, 6, 5 },
-        //         { 8, 7, 0 }
-        // };
         // create initial board from file
         In in = new In(args[0]);
         int n = in.readInt();
@@ -52,7 +40,7 @@ public class PuzzleChecker {
         Board initial = new Board(tiles);
 
         // solve the puzzle
-        Solver solver = new Solver(initial);
+        SolverTwo solver = new SolverTwo(initial);
 
         // print solution to standard output
         if (!solver.isSolvable())
@@ -62,6 +50,5 @@ public class PuzzleChecker {
             for (Board board : solver.solution())
                 StdOut.println(board);
         }
-
     }
 }
