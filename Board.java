@@ -266,6 +266,7 @@ public class Board {
         // int[] b = { 4, 2, 5 };
         // int[] c = { 7, 8, 6 };
 
+        // test values for tiles
         int[] a = { 5, 8, 7 };
         int[] b = { 1, 4, 6 };
         int[] c = { 3, 0, 2 };
@@ -282,30 +283,29 @@ public class Board {
         // int[] c = { 7, 6, 5 };
 
         // goal tiles
-        // int[] ga = { 1, 2, 3 };
-        // int[] gb = { 4, 5, 6 };
-        // int[] gc = { 7, 8, 0 };
+        int[] ga = { 1, 2, 3 };
+        int[] gb = { 4, 5, 6 };
+        int[] gc = { 7, 8, 0 };
 
 
         int[][] tiles = { a, b, c };
-        // int[][] goal = { ga, gb, gc };
+        int[][] goal = { ga, gb, gc };
 
         Board board = new Board(tiles);
-        // Board goalBoard = new Board(goal);
+        Board goalBoard = new Board(goal);
         System.out.println("Original board");
         System.out.println(board.toString());
 
-        // Board twin = board.twin();
-        // System.out.println("Twin board");
-        // System.out.println(twin.toString());
+        Board twin = board.twin();
+        System.out.println("Twin board");
+        System.out.println(twin.toString());
 
         System.out.println("Hamming distance in the original board is: " + board.hamming());
         System.out.println();
         System.out.println("Manhattan distance in the original board is: " + board.manhattan());
-        // System.out.println("Manhattan two distance is: " + board.manhattanTwo());
         System.out.println();
-        // System.out.println("Hamming distance in the twin board is: " + twin.hamming());
-        // System.out.println("Manhattan distance in the twin board is: " + twin.manhattan());
+        System.out.println("Hamming distance in the twin board is: " + twin.hamming());
+        System.out.println("Manhattan distance in the twin board is: " + twin.manhattan());
 
         System.out.println("Neighbors of the original board are:");
         for (Board neighbor : board.neighbors()) {
@@ -318,7 +318,7 @@ public class Board {
         System.out.println(secondTwin.toString());
 
         System.out.println("Is puzzle solved: " + board.isGoal());
-        // System.out.println("Are both boards equal: " + board.equals(goalBoard));
+        System.out.println("Are both boards equal: " + board.equals(goalBoard));
     }
 
 }
