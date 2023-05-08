@@ -1,15 +1,15 @@
-import edu.princeton.cs.algs4.BinarySearchST;
 import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Board {
-    private final BinarySearchST<Integer, TileCoordinates> goalCoordinates;
+    // private final BinarySearchST<Integer, TileCoordinates> goalCoordinates;
     private final int[][] tiles;
     private final int dimension;
     private final int firstIndexToSwap;
     private final int secondIndextoSwap;
+    private final int[] flatTiles;
 
     /**
      * Create a board from n by n array of tiles
@@ -21,11 +21,12 @@ public class Board {
         this.tiles = copyBoardTiles(tiles);
 
         dimension = this.tiles.length;
-        goalCoordinates = generateGoalCoordinates();
+        // goalCoordinates = generateGoalCoordinates();
 
         int[] twinIndicies = getRandomPairOfIndicesInBoard();
         firstIndexToSwap = twinIndicies[0];
         secondIndextoSwap = twinIndicies[1];
+        flatTiles = flattenTiles();
     }
 
     private boolean isBoardSymetic(int[][] inputTiles) {
@@ -33,16 +34,16 @@ public class Board {
         return true;
     }
 
-    private BinarySearchST<Integer, TileCoordinates> generateGoalCoordinates() {
-        BinarySearchST<Integer, TileCoordinates> result = new BinarySearchST<>();
-        for (int x = 0, i = 1; x < dimension(); x++) {
-            for (int y = 0; y < dimension(); y++, i++) {
-                if (i == dimension() * dimension()) i = 0;
-                result.put(i, new TileCoordinates(x, y));
-            }
-        }
-        return result;
-    }
+    // private BinarySearchST<Integer, TileCoordinates> generateGoalCoordinates() {
+    //     BinarySearchST<Integer, TileCoordinates> result = new BinarySearchST<>();
+    //     for (int x = 0, i = 1; x < dimension(); x++) {
+    //         for (int y = 0; y < dimension(); y++, i++) {
+    //             if (i == dimension() * dimension()) i = 0;
+    //             result.put(i, new TileCoordinates(x, y));
+    //         }
+    //     }
+    //     return result;
+    // }
 
     /**
      * Return string representation of current board.
@@ -96,24 +97,65 @@ public class Board {
      *
      * @return sum of Manhattan distances between tiles and goal tiles
      */
+    // public int manhattan() {
+    //     int manhattan = 0;
+    //
+    //     for (int row = 0; row < dimension(); row++) {
+    //         for (int col = 0; col < dimension(); col++) {
+    //             int currentElement = tiles[row][col];
+    //             if (currentElement == 0) continue;
+    //
+    //             int singleDistance = Math.abs(goalCoordinates.get(currentElement).row - row)
+    //                     + Math.abs(
+    //                     goalCoordinates.get(currentElement).col - col);
+    //             manhattan += singleDistance;
+    //
+    //         }
+    //     }
+    //     return manhattan;
+    // }
     public int manhattan() {
         int manhattan = 0;
+        for (int i = 0, k = 1; i < flatTiles.length; i++, k++) {
+            int element = flatTiles[i];
+            if (element == 0 || element == k) continue;
 
-        for (int row = 0; row < dimension(); row++) {
-            for (int col = 0; col < dimension(); col++) {
-                int currentElement = tiles[row][col];
-                if (currentElement == 0) continue;
-
-                int singleDistance = Math.abs(goalCoordinates.get(currentElement).row - row)
-                        + Math.abs(
-                        goalCoordinates.get(currentElement).col - col);
-                manhattan += singleDistance;
-
+            if (element % dimension() == 0) {
+                manhattan += Math.abs(i / dimension() - (element / dimension() - 1)) + Math.abs(
+                        i % dimension() - (dimension() - 1));
             }
+            else {
+                manhattan += Math.abs(i / dimension() - flatTiles[i] / dimension()) + Math.abs(
+                        i % dimension() - Math.abs(flatTiles[i] % dimension() - 1));
+            }
+            // int rowDistance = Math.abs(i / dimension() - flatTiles[i] / dimension());
+            // int colDistance = Math.abs(
+            //         i % dimension() - Math.abs(flatTiles[i] % dimension() - 1));
+            // // int diff = Math.abs(flatTiles[i] - k);
+            // manhattan += (rowDistance) + (colDistance);
+
         }
         return manhattan;
     }
-
+    // public int manhattan() {
+    //     int manhattan = 0;
+    //     for (int row = 0, k = 1; row < dimension(); row++) {
+    //         for (int col = 0; col < dimension(); col++, k++) {
+    //             int element = tiles[row][col];
+    //             if (element == 0 || element == k) continue;
+    //
+    //             if (element % dimension() == 0) {
+    //                 manhattan += Math.abs(row - (element / dimension() - 1)) + Math.abs(
+    //                         col - (dimension() - 1));
+    //             }
+    //             else {
+    //                 manhattan += Math.abs(row - (element / dimension())) + Math.abs(
+    //                         col - Math.abs(element % dimension() - 1));
+    //             }
+    //         }
+    //     }
+    //     return manhattan;
+    // }
 
     /**
      * Check if current board is equal to the goal board.
@@ -153,37 +195,42 @@ public class Board {
     public Iterable<Board> neighbors() {
         ArrayList<Board> neighbors = new ArrayList<>();
 
-        TileCoordinates emptyTile = getEmptyTileCoordinates();
-        if (emptyTile == null) return neighbors;
+        int[] emptyTile = getEmptyTileCoordinates();
+        if (emptyTile.length == 0) return neighbors;
 
-        if (emptyTile.row < tiles.length - 1) {
+        if (emptyTile[0] < tiles.length - 1) {
             neighbors.add(
-                    newNeighborByRow(emptyTile.row, emptyTile.col, emptyTile.row + 1));
+                    newNeighborByRow(emptyTile[0], emptyTile[1], emptyTile[0] + 1));
         }
 
-        if (emptyTile.row > 0) {
+        if (emptyTile[0] > 0) {
             neighbors.add(
-                    newNeighborByRow(emptyTile.row, emptyTile.col, emptyTile.row - 1));
+                    newNeighborByRow(emptyTile[0], emptyTile[1], emptyTile[0] - 1));
         }
 
-        if (emptyTile.col < tiles.length - 1) {
+        if (emptyTile[1] < tiles.length - 1) {
             neighbors.add(
-                    newNeighborByColumn(emptyTile.row, emptyTile.col, emptyTile.col + 1));
+                    newNeighborByColumn(emptyTile[0], emptyTile[1], emptyTile[1] + 1));
         }
 
-        if (emptyTile.col > 0) {
+        if (emptyTile[1] > 0) {
             neighbors.add(
-                    newNeighborByColumn(emptyTile.row, emptyTile.col, emptyTile.col - 1));
+                    newNeighborByColumn(emptyTile[0], emptyTile[1], emptyTile[1] - 1));
         }
 
         return neighbors;
     }
 
-    private TileCoordinates getEmptyTileCoordinates() {
+    private int[] getEmptyTileCoordinates() {
+        int[] result = new int[2];
         for (int row = 0; row < tiles.length; row++)
             for (int col = 0; col < tiles[row].length; col++)
-                if (tiles[row][col] == 0) return new TileCoordinates(row, col);
-        return null;
+                if (tiles[row][col] == 0) {
+                    result[0] = row;
+                    result[1] = col;
+                }
+
+        return result;
     }
 
     private Board newNeighborByRow(int row, int col, int newRow) {
@@ -275,6 +322,10 @@ public class Board {
         // int[] b = { 4, 2, 5 };
         // int[] c = { 7, 8, 6 };
 
+        int[] a = { 5, 8, 7 };
+        int[] b = { 1, 4, 6 };
+        int[] c = { 3, 0, 2 };
+
         // test values for tiles
         // int[] a = { 1, 5, 3, 8 };
         // int[] b = { 4, 2, 0, 9 };
@@ -282,32 +333,35 @@ public class Board {
         // int[] d = { 11, 12, 13, 14 };
 
         // test values for tiles
-        int[] a = { 8, 1, 3 };
-        int[] b = { 4, 0, 2 };
-        int[] c = { 7, 6, 5 };
+        // int[] a = { 8, 1, 3 };
+        // int[] b = { 4, 0, 2 };
+        // int[] c = { 7, 6, 5 };
 
         // goal tiles
-        int[] ga = { 1, 2, 3 };
-        int[] gb = { 4, 5, 6 };
-        int[] gc = { 7, 8, 0 };
+        // int[] ga = { 1, 2, 3 };
+        // int[] gb = { 4, 5, 6 };
+        // int[] gc = { 7, 8, 0 };
 
 
         int[][] tiles = { a, b, c };
-        int[][] goal = { ga, gb, gc };
+        // int[][] goal = { ga, gb, gc };
 
         Board board = new Board(tiles);
-        Board goalBoard = new Board(goal);
+        // Board goalBoard = new Board(goal);
         System.out.println("Original board");
         System.out.println(board.toString());
 
-        Board twin = board.twin();
-        System.out.println("Twin board");
-        System.out.println(twin.toString());
+        // Board twin = board.twin();
+        // System.out.println("Twin board");
+        // System.out.println(twin.toString());
 
         System.out.println("Hamming distance in the original board is: " + board.hamming());
+        System.out.println();
         System.out.println("Manhattan distance in the original board is: " + board.manhattan());
-        System.out.println("Hamming distance in the twin board is: " + twin.hamming());
-        System.out.println("Manhattan distance in the twin board is: " + twin.manhattan());
+        // System.out.println("Manhattan two distance is: " + board.manhattanTwo());
+        System.out.println();
+        // System.out.println("Hamming distance in the twin board is: " + twin.hamming());
+        // System.out.println("Manhattan distance in the twin board is: " + twin.manhattan());
 
         System.out.println("Neighbors of the original board are:");
         for (Board neighbor : board.neighbors()) {
@@ -320,7 +374,7 @@ public class Board {
         System.out.println(secondTwin.toString());
 
         System.out.println("Is puzzle solved: " + board.isGoal());
-        System.out.println("Are both boards equal: " + board.equals(goalBoard));
+        // System.out.println("Are both boards equal: " + board.equals(goalBoard));
     }
 
 }
