@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Board {
-    // private final BinarySearchST<Integer, TileCoordinates> goalCoordinates;
     private final int[][] tiles;
     private final int dimension;
     private final int firstIndexToSwap;
     private final int secondIndextoSwap;
-    private final int[] flatTiles;
 
     /**
      * Create a board from n by n array of tiles
@@ -21,29 +19,16 @@ public class Board {
         this.tiles = copyBoardTiles(tiles);
 
         dimension = this.tiles.length;
-        // goalCoordinates = generateGoalCoordinates();
 
         int[] twinIndicies = getRandomPairOfIndicesInBoard();
         firstIndexToSwap = twinIndicies[0];
         secondIndextoSwap = twinIndicies[1];
-        flatTiles = flattenTiles();
     }
 
     private boolean isBoardSymetic(int[][] inputTiles) {
         for (int[] row : inputTiles) if (row.length != inputTiles.length) return false;
         return true;
     }
-
-    // private BinarySearchST<Integer, TileCoordinates> generateGoalCoordinates() {
-    //     BinarySearchST<Integer, TileCoordinates> result = new BinarySearchST<>();
-    //     for (int x = 0, i = 1; x < dimension(); x++) {
-    //         for (int y = 0; y < dimension(); y++, i++) {
-    //             if (i == dimension() * dimension()) i = 0;
-    //             result.put(i, new TileCoordinates(x, y));
-    //         }
-    //     }
-    //     return result;
-    // }
 
     /**
      * Return string representation of current board.
@@ -116,8 +101,9 @@ public class Board {
     // }
     public int manhattan() {
         int manhattan = 0;
-        for (int i = 0, k = 1; i < flatTiles.length; i++, k++) {
-            int element = flatTiles[i];
+        int[] flat = flattenTiles();
+        for (int i = 0, k = 1; i < flat.length; i++, k++) {
+            int element = flat[i];
             if (element == 0 || element == k) continue;
 
             if (element % dimension() == 0) {
@@ -125,8 +111,8 @@ public class Board {
                         i % dimension() - (dimension() - 1));
             }
             else {
-                manhattan += Math.abs(i / dimension() - flatTiles[i] / dimension()) + Math.abs(
-                        i % dimension() - Math.abs(flatTiles[i] % dimension() - 1));
+                manhattan += Math.abs(i / dimension() - flat[i] / dimension()) + Math.abs(
+                        i % dimension() - Math.abs(flat[i] % dimension() - 1));
             }
             // int rowDistance = Math.abs(i / dimension() - flatTiles[i] / dimension());
             // int colDistance = Math.abs(
