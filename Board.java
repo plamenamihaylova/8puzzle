@@ -18,8 +18,7 @@ public class Board {
      */
     public Board(int[][] tiles) {
         if (tiles == null || !isBoardSymetic(tiles)) throw new IllegalArgumentException();
-        // this.tiles = copyBoardTiles(tiles);
-        this.tiles = tiles.clone();
+        this.tiles = copyBoardTiles(tiles);
 
         dimension = this.tiles.length;
         goalCoordinates = generateGoalCoordinates();
@@ -36,11 +35,9 @@ public class Board {
 
     private BinarySearchST<Integer, TileCoordinates> generateGoalCoordinates() {
         BinarySearchST<Integer, TileCoordinates> result = new BinarySearchST<>();
-        // int i = 1;
         for (int x = 0, i = 1; x < dimension(); x++) {
             for (int y = 0; y < dimension(); y++, i++) {
                 if (i == dimension() * dimension()) i = 0;
-                // result.put(0, new TileCoordinates(x, y));
                 result.put(i, new TileCoordinates(x, y));
             }
         }
@@ -211,13 +208,13 @@ public class Board {
         return copy;
     }
 
-    // private int[][] copyBoardTiles(int[][] tilesToCopy) {
-    //     int[][] copy = new int[tilesToCopy.length][];
-    //     for (int row = 0; row < tilesToCopy.length; row++) {
-    //         copy[row] = Arrays.copyOf(tilesToCopy[row], tilesToCopy[row].length);
-    //     }
-    //     return copy;
-    // }
+    private int[][] copyBoardTiles(int[][] tilesToCopy) {
+        int[][] copy = new int[tilesToCopy.length][];
+        for (int row = 0; row < tilesToCopy.length; row++) {
+            copy[row] = Arrays.copyOf(tilesToCopy[row], tilesToCopy[row].length);
+        }
+        return copy;
+    }
 
 
     // a board that is obtained by exchanging any pair of tiles
