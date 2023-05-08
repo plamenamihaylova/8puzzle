@@ -82,23 +82,6 @@ public class Board {
      *
      * @return sum of Manhattan distances between tiles and goal tiles
      */
-    // public int manhattan() {
-    //     int manhattan = 0;
-    //
-    //     for (int row = 0; row < dimension(); row++) {
-    //         for (int col = 0; col < dimension(); col++) {
-    //             int currentElement = tiles[row][col];
-    //             if (currentElement == 0) continue;
-    //
-    //             int singleDistance = Math.abs(goalCoordinates.get(currentElement).row - row)
-    //                     + Math.abs(
-    //                     goalCoordinates.get(currentElement).col - col);
-    //             manhattan += singleDistance;
-    //
-    //         }
-    //     }
-    //     return manhattan;
-    // }
     public int manhattan() {
         int manhattan = 0;
         int[] flat = flattenTiles();
@@ -114,34 +97,9 @@ public class Board {
                 manhattan += Math.abs(i / dimension() - flat[i] / dimension()) + Math.abs(
                         i % dimension() - Math.abs(flat[i] % dimension() - 1));
             }
-            // int rowDistance = Math.abs(i / dimension() - flatTiles[i] / dimension());
-            // int colDistance = Math.abs(
-            //         i % dimension() - Math.abs(flatTiles[i] % dimension() - 1));
-            // // int diff = Math.abs(flatTiles[i] - k);
-            // manhattan += (rowDistance) + (colDistance);
-
         }
         return manhattan;
     }
-    // public int manhattan() {
-    //     int manhattan = 0;
-    //     for (int row = 0, k = 1; row < dimension(); row++) {
-    //         for (int col = 0; col < dimension(); col++, k++) {
-    //             int element = tiles[row][col];
-    //             if (element == 0 || element == k) continue;
-    //
-    //             if (element % dimension() == 0) {
-    //                 manhattan += Math.abs(row - (element / dimension() - 1)) + Math.abs(
-    //                         col - (dimension() - 1));
-    //             }
-    //             else {
-    //                 manhattan += Math.abs(row - (element / dimension())) + Math.abs(
-    //                         col - Math.abs(element % dimension() - 1));
-    //             }
-    //         }
-    //     }
-    //     return manhattan;
-    // }
 
     /**
      * Check if current board is equal to the goal board.
