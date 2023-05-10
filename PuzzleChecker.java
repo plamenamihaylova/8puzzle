@@ -40,7 +40,7 @@ public class PuzzleChecker {
         Board initial = new Board(tiles);
 
         // solve the puzzle
-        SolverTwo solver = new SolverTwo(initial);
+        Solver solver = new Solver(initial);
 
         // print solution to standard output
         if (!solver.isSolvable())
