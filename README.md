@@ -81,7 +81,7 @@ We consider two priority functions:
 
 #### Board API
 
-``` agsl
+```
 public class Board {
     public Board(int[][] blocks)           // construct a board from an n-by-n array of blocks
                                            // (where blocks[i][j] = block in row i, column j)
@@ -101,7 +101,7 @@ public class Board {
 
 #### Solver API:
 
-``` agsl
+```
 public class Solver {
     public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
     public boolean isSolvable()            // is the initial board solvable?
@@ -121,6 +121,7 @@ In the process of trying to get the maximum score I realized thisapproach wasn't
 I wasn't using all board's methods that could have helped me when checking wheather a puzzle is solvable or not.
 So, I redid my logic to check sumultaneously if the current board or its twin are solvable or not.
 If the twin board is solvable, the main board can't be solvable.
+
 ---
 
 ### Useful resources that have helped me in completing this assignment:
