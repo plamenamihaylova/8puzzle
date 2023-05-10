@@ -7,6 +7,7 @@ Assignment | [my coursera profile](https://www.coursera.org/user/045cf702be8b31e
 
 **The task is to write a program that solves the 8-puzzle problem (and its natural generalizations) using the A\*
 search algorithm.**
+
 ---
 <!-- TOC -->
 
