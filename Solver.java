@@ -1,13 +1,13 @@
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
+import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
 public class Solver {
+    private final SearchNode initialNode;
     private SearchNode searchNode;
     private int moves;
+    private boolean solved;
 
     private class SearchNode implements Comparable<SearchNode> {
         private final Board board;
@@ -38,53 +38,68 @@ public class Solver {
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
-        searchNode = new SearchNode(initial, 0, null);
         moves = 0;
+        initialNode = new SearchNode(initial, 0, null);
+        solved = false;
+        findSolution();
         solution();
     }
 
+    private void findSolution() {
+        boolean twinSolved = false;
+
+        MinPQ<SearchNode> priorityQueue = new MinPQ<>();
+        MinPQ<SearchNode> twinPriorityQueue = new MinPQ<>();
+
+        priorityQueue.insert(initialNode);
+        twinPriorityQueue.insert(new SearchNode(initialNode.board.twin(), 0, null));
+
+        SearchNode node;
+        SearchNode twinNode;
+
+        while (!solved && !twinSolved) {
+            node = priorityQueue.delMin();
+            solved = node.board.isGoal();
+
+            twinNode = twinPriorityQueue.delMin();
+            twinSolved = twinNode.board.isGoal();
+
+            for (Board board : node.board.neighbors()) {
+                if (node.previous != null && node.previous.board.equals(board)) continue;
+                priorityQueue.insert(new SearchNode(board, node.moves + 1, node));
+            }
+
+            for (Board board : twinNode.board.neighbors()) {
+                if (twinNode.previous != null && twinNode.previous.board.equals(board)) continue;
+                twinPriorityQueue.insert(new SearchNode(board, twinNode.moves + 1, twinNode));
+            }
+
+            searchNode = node;
+        }
+    }
+
+
+    // sequence of boards in the shortest solution; null if unsolvable
+    public Iterable<Board> solution() {
+        if (!isSolvable()) return null;
+
+        moves = searchNode.moves;
+        SearchNode tmp = searchNode;
+
+        Stack<Board> solution = new Stack<>();
+
+        while (tmp.previous != null) {
+            solution.push(tmp.board);
+            tmp = tmp.previous;
+        }
+
+        solution.push(tmp.board);
+
+        return solution;
+    }
+
     public boolean isSolvable() {
-        int inversions = numOfInversions();
-        if (searchNode.board.dimension() % 2 == 0) {
-            return (getBlankRow() + inversions) % 2 != 0;
-        }
-        else return inversions % 2 == 0;
-    }
-
-    private int numOfInversions() {
-        int[] flatOriginalBoard = getFlatBoardTilesArray(searchNode.board.toString());
-
-        int inversions = 0;
-        for (int i = 0; i < flatOriginalBoard.length; i++) {
-            for (int j = i + 1; j < flatOriginalBoard.length; j++) {
-                if (flatOriginalBoard[i] > flatOriginalBoard[j] && flatOriginalBoard[i] != 0
-                        && flatOriginalBoard[j] != 0) {
-                    inversions++;
-                }
-            }
-        }
-        return inversions;
-    }
-
-    private int[] getFlatBoardTilesArray(String input) {
-        String[] lines = input.split("\n");
-        int[] elements = new int[(lines.length - 1) * (lines.length - 1)];
-
-        int index = 0;
-        for (int i = 1; i < lines.length; i++) {
-            String[] row = lines[i].trim().split("\\s+");
-            for (int j = 0; j < row.length; j++) {
-                elements[index++] = Integer.parseInt(row[j]);
-            }
-        }
-        return elements;
-    }
-
-    private int getBlankRow() {
-        int[] flatBoard = getFlatBoardTilesArray(searchNode.board.toString());
-        for (int i = 0; i < flatBoard.length; i++)
-            if (flatBoard[i] == 0) return i / searchNode.board.dimension();
-        return 0;
+        return solved;
     }
 
 
@@ -92,51 +107,6 @@ public class Solver {
     public int moves() {
         if (!isSolvable()) return -1;
         return moves;
-    }
-
-    // sequence of boards in a shortest solution; null if unsolvable
-    public Iterable<Board> solution() {
-        if (!isSolvable()) return null;
-
-        MinPQ<SearchNode> priorityQueue = new MinPQ<>();
-        ArrayList<Board> result = new ArrayList<>();
-
-        if (searchNode.previous == null) {
-            priorityQueue.insert(searchNode);
-            // processed.add(searchNode.board);
-        }
-
-        SearchNode solution = findSolution(priorityQueue, result);
-
-        for (SearchNode x = solution; Objects.requireNonNull(x).previous != null;
-             x = solution.previous) {
-            result.add(x.board);
-            moves++;
-        }
-        return result;
-    }
-
-    private SearchNode findSolution(MinPQ<SearchNode> currentPQ,
-                                    ArrayList<Board> processedBoards) {
-
-        SearchNode node = currentPQ.delMin();
-        processedBoards.add(node.board);
-
-        if (node.board.isGoal()) return node;
-        else findSolution(getNeighborsPQ(node, currentPQ), processedBoards);
-
-        return node;
-    }
-
-    private MinPQ<SearchNode> getNeighborsPQ(SearchNode parent,
-                                             MinPQ<SearchNode> neighbors) {
-        moves++;
-        for (Board neighborBoard : parent.board.neighbors()) {
-            if (parent.previous != null && neighborBoard.equals(parent.previous.board)) continue;
-            SearchNode neighborSearchNode = new SearchNode(neighborBoard, parent.moves + 1, parent);
-            neighbors.insert(neighborSearchNode);
-        }
-        return neighbors;
     }
 
 
