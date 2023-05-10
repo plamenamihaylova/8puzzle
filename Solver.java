@@ -35,19 +35,21 @@ public class Solver {
         }
     }
 
-    // find a solution to the initial board (using the A* algorithm)
+    /**
+     * Find a solution to the initial board (using the A* algorithm)
+     *
+     * @param initial board of the slider puzzle
+     */
     public Solver(Board initial) {
         if (initial == null) throw new IllegalArgumentException();
-        moves = 0;
         initialNode = new SearchNode(initial, 0, null);
         solved = false;
+        moves = 0;
         findSolution();
         solution();
     }
 
     private void findSolution() {
-        boolean twinSolved = false;
-
         MinPQ<SearchNode> priorityQueue = new MinPQ<>();
         MinPQ<SearchNode> twinPriorityQueue = new MinPQ<>();
 
@@ -56,6 +58,8 @@ public class Solver {
 
         SearchNode node;
         SearchNode twinNode;
+
+        boolean twinSolved = false;
 
         while (!solved && !twinSolved) {
             node = priorityQueue.delMin();
@@ -73,13 +77,15 @@ public class Solver {
                 if (twinNode.previous != null && twinNode.previous.board.equals(board)) continue;
                 twinPriorityQueue.insert(new SearchNode(board, twinNode.moves + 1, twinNode));
             }
-
             searchNode = node;
         }
     }
 
-
-    // sequence of boards in the shortest solution; null if unsolvable
+    /**
+     * Return the sequence of boards in the shortest solution; null if unsolvable.
+     *
+     * @return iterable sequence of boards in the shortest solution; null if unsolvable
+     */
     public Iterable<Board> solution() {
         if (!isSolvable()) return null;
 
@@ -103,7 +109,11 @@ public class Solver {
     }
 
 
-    // min number of moves to solve initial board; -1 if unsolvable
+    /**
+     * Return the minimum number of moves to solve initial board; -1 if initial board is unsolvable.
+     *
+     * @return the minimum number of moves to solve initial board, -1 if unsolvable
+     */
     public int moves() {
         if (!isSolvable()) return -1;
         return moves;
