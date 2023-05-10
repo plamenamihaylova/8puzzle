@@ -207,8 +207,12 @@ public class Board {
         return copy;
     }
 
-
-    // a board that is obtained by exchanging any pair of tiles
+    /**
+     * Return a board that is obtained by exchanging any pair of tiles of the original board.
+     * None of the exchanged tiles is the empty one.
+     *
+     * @return board that is obtained by exchanging any pair of tiles
+     */
     public Board twin() {
         int[] board = flattenTiles();
         int[] twinBoard = board.clone();
