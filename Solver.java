@@ -3,6 +3,23 @@ import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
 import edu.princeton.cs.algs4.StdOut;
 
+/**
+ * ASSESSMENT SUMMARY
+ * <p>
+ * Compilation:  PASSED
+ * API:          PASSED
+ * <p>
+ * SpotBugs:     PASSED
+ * PMD:          PASSED
+ * Checkstyle:   PASSED
+ * <p>
+ * Correctness:  52/52 tests passed
+ * Memory:       22/22 tests passed
+ * Timing:       125/125 tests passed
+ * <p>
+ * Aggregate score: 100.00%
+ * [ Compilation: 5%, API: 5%, Style: 0%, Correctness: 60%, Timing: 10%, Memory: 20% ]
+ */
 public class Solver {
     private final SearchNode initialNode;
     private SearchNode searchNode;
