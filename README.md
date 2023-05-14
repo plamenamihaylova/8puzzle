@@ -1,6 +1,6 @@
 <img height="400" src="logo.png" title="8 puzzle logo" width="1000"/>
 
-## Slider puzzle
+### Slider puzzle
 
 **Algorithms Part 1 | Coursera course | Week 4
 Assignment | [my coursera profile](https://www.coursera.org/user/045cf702be8b31ef1aa039e2b4f07db6)**
