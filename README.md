@@ -5,9 +5,6 @@
 **Algorithms Part 1 | Coursera course | Week 4
 Assignment | [my coursera profile](https://www.coursera.org/user/045cf702be8b31ef1aa039e2b4f07db6)**
 
-**The task is to write a program that solves the 8-puzzle problem (and its natural generalizations) using the A\*
-search algorithm.**
-
 ---
 <!-- TOC -->
 
@@ -22,10 +19,15 @@ search algorithm.**
 
 <!-- TOC -->
 
+---
+
 ### Task specification
 
 🔗Detailed specifications for the assignment can be
 found [here](https://coursera.cs.princeton.edu/algs4/assignments/8puzzle/specification.php).
+
+The task is to write a program that solves the 8-puzzle problem (and its natural generalizations) using the A\*
+search algorithm.
 
 #### The problem
 
